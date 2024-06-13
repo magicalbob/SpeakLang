@@ -28,6 +28,9 @@ def get_chatgpt_response(user_input):
     elif "completions" in response_data:
         return response_data["completions"][0]["data"]["text"]
     else:
+        print("<<<<<<<<<<<<<<<<<<<<")
+        print(response_data)
+        print(">>>>>>>>>>>>>>>>>>>>")
         return "Error: Unexpected response format from ChatGPT API"
 
 # Function to convert text to speech
