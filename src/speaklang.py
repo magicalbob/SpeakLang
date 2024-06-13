@@ -7,7 +7,9 @@ import os
 
 # Function to send input to ChatGPT API and get response
 def get_chatgpt_response(user_input):
+    # get chatgpt api ket from env var
     api_key = os.environ.get("OPENAI_API_KEY")
+
     endpoint = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Content-Type": "application/json",
@@ -21,7 +23,12 @@ def get_chatgpt_response(user_input):
     }
     response = requests.post(endpoint, json=data, headers=headers)
     response_data = response.json()
-    return response_data["choices"][0]["message"]["content"]
+    if "choices" in response_data:
+        return response_data["choices"][0]["message"]["content"]
+    elif "completions" in response_data:
+        return response_data["completions"][0]["data"]["text"]
+    else:
+        return "Error: Unexpected response format from ChatGPT API"
 
 # Function to convert text to speech
 def speak(text):
