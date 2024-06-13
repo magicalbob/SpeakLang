@@ -1,5 +1,5 @@
 export PYTHONPATH=.
-pip install -r requests.txt
+pip install -r requirements.txt
 ./tests/test_speaklang.py
 ~/.local/bin/coverage run -m unittest tests/test_speaklang.py
 ~/.local/bin/coverage xml
