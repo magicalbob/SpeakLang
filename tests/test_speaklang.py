@@ -2,7 +2,7 @@
 
 import unittest
 from unittest.mock import patch, MagicMock
-from ..speaklang import get_chatgpt_response, speak
+from speaklang.speaklang import get_chatgpt_response, speak
 
 class TestSpeakLang(unittest.TestCase):
     @patch('speaklang.requests.post')
