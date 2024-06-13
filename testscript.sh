@@ -1,4 +1,3 @@
-export PYTHONPATH=speaklang
 pip install -r requests.txt
 ./tests/test_speaklang.py
 ~/.local/bin/coverage run -m unittest tests/test_speaklang.py
