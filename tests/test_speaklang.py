@@ -2,10 +2,10 @@
 
 import unittest
 from unittest.mock import patch, MagicMock
-from speaklang.speaklang import get_chatgpt_response, speak
+from speaklang.speaklang import get_chatgpt_response, speak  # Importing directly from the module
 
 class TestSpeakLang(unittest.TestCase):
-    @patch('speaklang.requests.post')
+    @patch('speaklang.speaklang.requests.post')  # Patching the correct path to requests
     def test_get_chatgpt_response(self, mock_post):
         # Mock response data
         mock_response_data = {
@@ -22,8 +22,8 @@ class TestSpeakLang(unittest.TestCase):
         # Check if the function returns the expected response
         self.assertEqual(response, "Bonjour!")
 
-    @patch('speaklang.gTTS')
-    @patch('speaklang.os.system')
+    @patch('speaklang.speaklang.gTTS')  # Patching the correct path to gTTS
+    @patch('speaklang.speaklang.os.system')  # Patching the correct path to os.system
     def test_speak(self, mock_os_system, mock_gtts):
         # Mock gTTS object and save method
         mock_tts = MagicMock()
@@ -41,3 +41,4 @@ class TestSpeakLang(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
