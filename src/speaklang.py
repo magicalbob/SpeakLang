@@ -10,6 +10,8 @@ def get_chatgpt_response(user_input):
     # get chatgpt api ket from env var
     api_key = os.environ.get("OPENAI_API_KEY")
 
+    question_to_chatgpt = f"If I said '{user_input}' how would you respond?"
+
     endpoint = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Content-Type": "application/json",
@@ -18,7 +20,7 @@ def get_chatgpt_response(user_input):
     data = {
         "model": "gpt-3.5-turbo-0125",
         "messages": [
-            {"role": "user", "content": user_input}
+            {"role": "user", "content": question_to_chatgpt}
         ]
     }
     response = requests.post(endpoint, json=data, headers=headers)
