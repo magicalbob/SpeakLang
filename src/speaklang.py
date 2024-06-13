@@ -20,6 +20,7 @@ def get_chatgpt_response(user_input):
     data = {
         "model": "gpt-3.5-turbo-0125",
         "messages": [
+            {"role": "system", "content": "You are having a conversation with me in french. Just give your response as if talking naturally"},
             {"role": "user", "content": question_to_chatgpt}
         ]
     }
