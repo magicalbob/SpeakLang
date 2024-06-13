@@ -7,7 +7,7 @@ import os
 
 # Function to send input to ChatGPT API and get response
 def get_chatgpt_response(user_input):
-    api_key = "YOUR_API_KEY"  # Replace with your ChatGPT API key
+    api_key = os.environ.get("OPENAI_API_KEY")
     endpoint = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Content-Type": "application/json",
