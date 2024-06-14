@@ -46,13 +46,13 @@ def speak(text):
 def main():
     r = sr.Recognizer()
     with sr.Microphone() as source:
-        print("Listening for input... (say 'exit' to quit)")
+        print("À l'écoute de l'entrée... (dire 'sortie' pour quitter)")
         while True:
             try:
                 audio = r.listen(source)
                 user_input = r.recognize_google(audio, language="fr-FR")
                 print(f"User said: {user_input}")
-                if user_input.lower() == "exit":
+                if user_input.lower() == "sortie":
                     break
                 response = get_chatgpt_response(user_input)
                 print(f"ChatGPT responded: {response}")
