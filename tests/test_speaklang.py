@@ -2,8 +2,10 @@
 
 import unittest
 import io
+import sys
 from unittest.mock import patch, MagicMock
 from speaklang.speaklang import get_chatgpt_response, speak, main
+import speech_recognition as sr
 
 class TestSpeakLang(unittest.TestCase):
     @patch('speaklang.speaklang.requests.post')
@@ -101,5 +103,62 @@ class TestSpeakLang(unittest.TestCase):
         self.assertTrue(mock_listen.called)
         self.assertEqual(mock_listen.call_count, 2)  # Assuming two calls, one for "some speech" and one for "sortie")
 
+    @patch('speaklang.speaklang.sr.Recognizer')
+    @patch('speaklang.speaklang.get_chatgpt_response')
+    @patch('speaklang.speaklang.speak')
+    def test_main_unknown_value_error(self, mock_speak, mock_get_chatgpt_response, MockRecognizer):
+        # Create a mock recognizer instance and mock its methods
+        mock_recognizer_instance = MockRecognizer.return_value
+        mock_listen = mock_recognizer_instance.listen
+        mock_recognize_google = mock_recognizer_instance.recognize_google
+
+        # Mock the return values for recognize_google
+        mock_recognize_google.side_effect = ["error speech", "sortie"]
+
+        # Configure get_chatgpt_response to return a string for "error speech"
+        mock_get_chatgpt_response.side_effect = [sr.UnknownValueError(), "Error: Unexpected audio input"]
+
+        # Capture stdout output
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+
+        # Call the main function
+        with patch('speaklang.speaklang.sr.Microphone'):
+            main()
+
+        # Reset stdout
+        sys.stdout = sys.__stdout__
+
+        # Check if "Could not understand audio" message was printed
+        self.assertIn("Could not understand audio", captured_output.getvalue())
+
+    @patch('speaklang.speaklang.sr.Recognizer')  # Patching the Recognizer class
+    @patch('speaklang.speaklang.get_chatgpt_response')  # Mocking get_chatgpt_response for simplicity
+    @patch('speaklang.speaklang.speak')  # Mocking speak function for simplicity
+    def test_main_request_error(self, mock_speak, mock_get_chatgpt_response, MockRecognizer):
+        # Create a mock recognizer instance and mock its methods
+        mock_recognizer_instance = MockRecognizer.return_value
+        mock_listen = mock_recognizer_instance.listen
+        mock_recognize_google = mock_recognizer_instance.recognize_google
+
+        # Mock the return values for recognize_google
+        mock_recognize_google.side_effect = [sr.RequestError("Mock request error"), "sortie"]
+
+        # Capture stdout output
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+
+        # Call the main function
+        with patch('speaklang.speaklang.sr.Microphone'):
+            main()
+
+        # Reset stdout
+        sys.stdout = sys.__stdout__
+
+        # Check if "Error fetching results;" message with the specific error was printed
+        self.assertIn("Error fetching results;", captured_output.getvalue())
+        self.assertIn("Mock request error", captured_output.getvalue())
+
 if __name__ == '__main__':
     unittest.main()
+

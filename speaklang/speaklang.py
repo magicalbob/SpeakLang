@@ -58,7 +58,7 @@ def main():
                 print(f"ChatGPT responded: {response}")
                 speak(response)
             except sr.UnknownValueError:
-                print("Could not understand audio")
+                print("Could not understand audio")  # Print message for UnknownValueError
             except sr.RequestError as e:
                 print(f"Error fetching results; {e}")
 
