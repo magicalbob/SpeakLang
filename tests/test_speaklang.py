@@ -3,11 +3,10 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from speaklang.speaklang import get_chatgpt_response, speak, main
-
 class TestSpeakLang(unittest.TestCase):
     @patch('speaklang.speaklang.requests.post')
-    def test_get_chatgpt_response(self, mock_post):
-        # Mock response data
+    def test_get_chatgpt_response_choices(self, mock_post):
+        # Mock response data with "choices"
         mock_response_data = {
             "choices": [
                 {"message": {"content": "Bonjour!"}}
@@ -21,6 +20,23 @@ class TestSpeakLang(unittest.TestCase):
 
         # Check if the function returns the expected response
         self.assertEqual(response, "Bonjour!")
+
+    @patch('speaklang.speaklang.requests.post')
+    def test_get_chatgpt_response_completions(self, mock_post):
+        # Mock response data with "completions"
+        mock_response_data = {
+            "completions": [
+                {"data": {"text": "Au revoir!"}}
+            ]
+        }
+        # Configure mock to return the mock response data
+        mock_post.return_value.json.return_value = mock_response_data
+
+        # Call the function under test
+        response = get_chatgpt_response("Au revoir")
+
+        # Check if the function returns the expected response
+        self.assertEqual(response, "Au revoir!")
 
     @patch('speaklang.speaklang.gTTS')
     @patch('speaklang.speaklang.os.system')
