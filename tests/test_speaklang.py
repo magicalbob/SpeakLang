@@ -2,10 +2,10 @@
 
 import unittest
 from unittest.mock import patch, MagicMock
-from speaklang.speaklang import get_chatgpt_response, speak  # Importing directly from the module
+from speaklang.speaklang import get_chatgpt_response, speak, main
 
 class TestSpeakLang(unittest.TestCase):
-    @patch('speaklang.speaklang.requests.post')  # Patching the correct path to requests
+    @patch('speaklang.speaklang.requests.post')
     def test_get_chatgpt_response(self, mock_post):
         # Mock response data
         mock_response_data = {
@@ -22,8 +22,8 @@ class TestSpeakLang(unittest.TestCase):
         # Check if the function returns the expected response
         self.assertEqual(response, "Bonjour!")
 
-    @patch('speaklang.speaklang.gTTS')  # Patching the correct path to gTTS
-    @patch('speaklang.speaklang.os.system')  # Patching the correct path to os.system
+    @patch('speaklang.speaklang.gTTS')
+    @patch('speaklang.speaklang.os.system')
     def test_speak(self, mock_os_system, mock_gtts):
         # Mock gTTS object and save method
         mock_tts = MagicMock()
@@ -38,6 +38,29 @@ class TestSpeakLang(unittest.TestCase):
         mock_gtts.assert_called_once_with(text="Bonjour!", lang="fr")
         mock_save.assert_called_once_with("response.mp3")
         mock_os_system.assert_called_once_with("afplay response.mp3")
+
+    @patch('speaklang.speaklang.sr.Recognizer')  # Patching the Recognizer class
+    @patch('speaklang.speaklang.get_chatgpt_response')  # Mocking get_chatgpt_response for simplicity
+    @patch('speaklang.speaklang.speak')  # Mocking speak function for simplicity
+    def test_main_exit_command(self, mock_speak, mock_get_chatgpt_response, MockRecognizer):
+        # Create a mock recognizer instance and mock its methods
+        mock_recognizer_instance = MockRecognizer.return_value
+        mock_listen = mock_recognizer_instance.listen
+        mock_recognize_google = mock_recognizer_instance.recognize_google
+
+        # Mock the return values for recognize_google
+        mock_recognize_google.side_effect = ["some speech", "sortie"]
+
+        # Call the main function
+        main()
+
+        # Check if speak was called with the expected responses
+        mock_get_chatgpt_response.assert_called_with("some speech")
+        mock_speak.assert_called_with(mock_get_chatgpt_response.return_value)
+
+        # Check if the main loop exited after recognizing "sortie"
+        self.assertTrue(mock_listen.called)
+        self.assertEqual(mock_listen.call_count, 2)  # Assuming two calls, one for "some speech" and one for "sortie"
 
 if __name__ == '__main__':
     unittest.main()
