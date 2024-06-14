@@ -22,6 +22,11 @@ class TestSpeakLang(unittest.TestCase):
         # Check if the function returns the expected response
         self.assertEqual(response, "Bonjour!")
 
+        # Additional test: Check behavior when API returns unexpected data
+        mock_post.return_value.json.return_value = {"invalid": "data"}
+        response = get_chatgpt_response("Hello")
+        self.assertIsNone(response)  # Assuming None is returned on unexpected data
+
     @patch('speaklang.speaklang.gTTS')  # Patching the correct path to gTTS
     @patch('speaklang.speaklang.os.system')  # Patching the correct path to os.system
     def test_speak(self, mock_os_system, mock_gtts):
@@ -39,6 +44,10 @@ class TestSpeakLang(unittest.TestCase):
         mock_save.assert_called_once_with("response.mp3")
         mock_os_system.assert_called_once_with("afplay response.mp3")
 
+        # Additional test: Check behavior when speak function is called with empty text
+        speak("")
+        mock_gtts.assert_called_with(text="", lang="fr")  # Ensure gTTS called with empty text
+        mock_save.assert_called_with("response.mp3")  # Ensure save method called with default file name
+
 if __name__ == '__main__':
     unittest.main()
-
