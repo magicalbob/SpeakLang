@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 import unittest
+import io
 from unittest.mock import patch, MagicMock
 from speaklang.speaklang import get_chatgpt_response, speak, main
+
 class TestSpeakLang(unittest.TestCase):
     @patch('speaklang.speaklang.requests.post')
     def test_get_chatgpt_response_choices(self, mock_post):
@@ -37,6 +39,26 @@ class TestSpeakLang(unittest.TestCase):
 
         # Check if the function returns the expected response
         self.assertEqual(response, "Au revoir!")
+
+    @patch('speaklang.speaklang.requests.post')
+    def test_get_chatgpt_response_unexpected_format(self, mock_post):
+        # Mock response data with unexpected format
+        mock_response_data = {
+            "unexpected_field": "some_value"
+        }
+        # Configure mock to return the mock response data
+        mock_post.return_value.json.return_value = mock_response_data
+
+        # Use patch to capture print output
+        with patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            # Call the function under test
+            response = get_chatgpt_response("Unexpected")
+
+            # Check if the function prints debug information and returns the error message
+            self.assertIn("<<<<<<<<<<<<<<<<<<<<", mock_stdout.getvalue())
+            self.assertIn("{'unexpected_field': 'some_value'}", mock_stdout.getvalue())
+            self.assertIn(">>>>>>>>>>>>>>>>>>>>", mock_stdout.getvalue())
+            self.assertEqual(response, "Error: Unexpected response format from ChatGPT API")
 
     @patch('speaklang.speaklang.gTTS')
     @patch('speaklang.speaklang.os.system')
@@ -77,7 +99,7 @@ class TestSpeakLang(unittest.TestCase):
 
         # Check if the main loop exited after recognizing "sortie"
         self.assertTrue(mock_listen.called)
-        self.assertEqual(mock_listen.call_count, 2)  # Assuming two calls, one for "some speech" and one for "sortie"
+        self.assertEqual(mock_listen.call_count, 2)  # Assuming two calls, one for "some speech" and one for "sortie")
 
 if __name__ == '__main__':
     unittest.main()
