@@ -30,11 +30,12 @@ test_job:
     - sudo apt-get install -y python3-dev python3-pip libasound2-dev
     - pip install -r requirements.txt
     - python3 -m unittest tests.test_speaklang
-    - ~/.local/bin/coverage run -m unittest tests/test_speaklang
+    - ~/.local/bin/coverage run -m unittest tests.test_speaklang
     - ~/.local/bin/coverage xml
     - rm -rf __pycache__
+  variables:
+    GIT_STRATEGY: clone
+    PYTHONPATH: "${PYTHONPATH}:${CI_PROJECT_DIR}"  # Add project root to Python path
   artifacts:
     paths:
       - coverage.xml
-  variables:
-    GIT_STRATEGY: clone
