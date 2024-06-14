@@ -52,7 +52,8 @@ class TestSpeakLang(unittest.TestCase):
         mock_recognize_google.side_effect = ["some speech", "sortie"]
 
         # Call the main function
-        main()
+        with patch('speaklang.speaklang.sr.Microphone'):
+            main()
 
         # Check if speak was called with the expected responses
         mock_get_chatgpt_response.assert_called_with("some speech")
@@ -64,4 +65,3 @@ class TestSpeakLang(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
