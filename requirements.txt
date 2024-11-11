@@ -9,3 +9,4 @@ setuptools==70.0.0
 SpeechRecognition==3.10.4
 typing_extensions==4.12.2
 urllib3==2.2.1
+coverage
