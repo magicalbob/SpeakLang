@@ -5,7 +5,6 @@ gTTS==2.5.1
 idna==3.7
 PyAudio==0.2.14
 requests==2.32.3
-setuptools==70.0.0
 SpeechRecognition==3.10.4
 typing_extensions==4.12.2
 urllib3==2.2.1
