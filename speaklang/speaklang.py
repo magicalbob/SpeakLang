@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 
+import time
 import requests
 import speech_recognition as sr
 from gtts import gTTS
 import os
+from icecream import ic
+import argparse
 
 # Function to send input to ChatGPT API and get response
 def get_chatgpt_response(user_input):
-    # get chatgpt api ket from env var
     api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        return "Error: OPENAI_API_KEY is not set in the environment."
 
     question_to_chatgpt = f"If I said '{user_input}' how would you respond?"
 
@@ -20,7 +24,7 @@ def get_chatgpt_response(user_input):
     data = {
         "model": "gpt-3.5-turbo-0125",
         "messages": [
-            {"role": "system", "content": "You are having a conversation with me in french. Just give your response as if talking naturally"},
+            {"role": "system", "content": "You are having a conversation with me in French. Just give your response as if talking naturally."},
             {"role": "user", "content": question_to_chatgpt}
         ]
     }
@@ -43,24 +47,48 @@ def speak(text):
     os.system("afplay response.mp3")  # macOS command for playing audio
 
 # Main loop
-def main():
+def main(debug=False):
+    if debug:
+        ic.enable()
+    else:
+        ic.disable()
+
     r = sr.Recognizer()
-    with sr.Microphone() as source:
-        print("À l'écoute de l'entrée... (dire 'sortie' pour quitter)")
-        while True:
-            try:
+    mic = sr.Microphone()
+
+    print("À l'écoute de l'entrée... (dire 'sortie' pour quitter)")
+    while True:
+        try:
+            with mic as source:
+                r.adjust_for_ambient_noise(source)
                 audio = r.listen(source)
+            print("Processing audio...")
+            try:
                 user_input = r.recognize_google(audio, language="fr-FR")
-                print(f"User said: {user_input}")
                 if user_input.lower() == "sortie":
+                    print("Au revoir!")
                     break
+                print(f"User said: {user_input}")
+                ic(user_input)
+
+                # Get response from ChatGPT
                 response = get_chatgpt_response(user_input)
+                ic(response)
                 print(f"ChatGPT responded: {response}")
+
+                # Convert ChatGPT response to speech
                 speak(response)
             except sr.UnknownValueError:
-                print("Could not understand audio")  # Print message for UnknownValueError
+                print("Could not understand audio")
             except sr.RequestError as e:
-                print(f"Error fetching results; {e}")
+                print(f"API request error: {e}. Retrying...")
+                time.sleep(1)  # Retry after a short delay
+        except KeyboardInterrupt:
+            print("Exiting...")
+            break
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="SpeakLang: A ChatGPT-powered language conversation tool.")
+    parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+    args = parser.parse_args()
+    main(debug=args.debug)
