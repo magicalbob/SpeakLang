@@ -1,6 +1,6 @@
 certifi==2024.6.2
 charset-normalizer==3.3.2
-click==8.1.7
+click==8.2.1
 gTTS==2.5.1
 idna==3.7
 PyAudio==0.2.14
